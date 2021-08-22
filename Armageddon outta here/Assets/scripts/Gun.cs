@@ -1,8 +1,10 @@
 
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Gun : MonoBehaviour
 {
+    public GameObject slider;
     public float damage = 10f;
     public float range = 200f;
     public float fireRate = 2.0f;
@@ -11,17 +13,24 @@ public class Gun : MonoBehaviour
     public Camera fpsCam;
     public ParticleSystem muzzleFlash;
     public GameObject impactEffect;
-
     private float nextTimeToFire = 0.0f;
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(Time.time - nextTimeToFire);
+        ReloadBar reloadBar = slider.transform.GetComponent<ReloadBar>();
+        Debug.Log(slider.active);
         if (Input.GetButton("Fire1") && Time.time >= nextTimeToFire)
         {
+            slider.SetActive(true);
             nextTimeToFire = Time.time + 1.0f/fireRate;
+            reloadBar.setMaxMin(Time.time, nextTimeToFire);
             Shoot();
         }
+        if (slider.active)
+        {
+            reloadBar.setReloadTime(Time.time);
+        }
+        if (Time.time - nextTimeToFire >= 0.5f) slider.SetActive(false);
     }
     void Shoot ()
     {
