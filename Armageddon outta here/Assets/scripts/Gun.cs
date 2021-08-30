@@ -18,7 +18,6 @@ public class Gun : MonoBehaviour
     void Update()
     {
         ReloadBar reloadBar = slider.transform.GetComponent<ReloadBar>();
-        Debug.Log(slider.active);
         if (Input.GetButton("Fire1") && Time.time >= nextTimeToFire)
         {
             slider.SetActive(true);
