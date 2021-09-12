@@ -6,9 +6,9 @@ using UnityEngine.UI;
 public class ReloadBar : MonoBehaviour
 {
     public Slider slider;
-    public void setReloadTime(float time)
+    public void setValue(float val)
     {
-        slider.value = time;
+        slider.value = val;
     }
    public void setMaxMin(float start, float end)
     {

@@ -5,25 +5,42 @@ using UnityEngine.AI;
 public class Enemy : MonoBehaviour
 {
     private NavMeshAgent agent;
-    public Transform target;
+    private GameObject target;
     private float speedNorm;
     private float angularSpeedNorm;
+    public float reloadTime = 30;
+    private float reloadCounter;
+    public GameObject projectile;
+
     // Start is called before the first frame update
     void Start()
     {
+        target = GameObject.Find("Player");
         agent = GetComponent<NavMeshAgent>();
         speedNorm = agent.speed;
         angularSpeedNorm = agent.angularSpeed;
+        reloadCounter = 2;
     }
 
     // Update is called once per frame
     void Update()
     {
-        agent.SetDestination(target.position);
-        if (Vector3.Distance(target.position, transform.position) <= 15 && gameObject.CompareTag("Shooter"))
+        if (!target.transform.GetComponent<playerController>().gameWon)
         {
-            FaceTarget(target.position);
+            agent.SetDestination(target.transform.position);
+            FaceTarget(target.transform.position);
+            if (Vector3.Distance(target.transform.position, transform.position) <= 50 && gameObject.CompareTag("Shooter"))
+            {
+                agent.Stop();
+                reloadCounter--;
+                if (reloadCounter <= 0) shoot();
+            }
+            else
+            {
+                agent.Resume();
+            }
         }
+        else Destroy(gameObject);
     }
     private void FaceTarget(Vector3 destination)
     {
@@ -31,5 +48,10 @@ public class Enemy : MonoBehaviour
         lookPos.y = 0;
         Quaternion rotation = Quaternion.LookRotation(lookPos);
         transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 10 * Time.deltaTime);
+    }
+    private void shoot()
+    {
+        reloadCounter = reloadTime;
+        Instantiate(projectile, new Vector3(transform.position.x, transform.position.y + agent.height, transform.position.z) + (transform.forward*5) , new Quaternion { });
     }
 }

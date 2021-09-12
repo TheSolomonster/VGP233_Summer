@@ -6,6 +6,11 @@ TagManager:
   tags:
   - Shooter
   - Charger
+  - FxTemporaire
+  - Projectile
+  - Fire
+  - Exit
+  - potion
   layers:
   - Default
   - TransparentFX
