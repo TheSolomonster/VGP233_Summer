@@ -11,10 +11,12 @@ public class Enemy : MonoBehaviour
     public float reloadTime = 30;
     private float reloadCounter;
     public GameObject projectile;
+    private Target targetC;
 
     // Start is called before the first frame update
     void Start()
     {
+        targetC = GetComponent<Target>();
         target = GameObject.Find("Player");
         agent = GetComponent<NavMeshAgent>();
         speedNorm = agent.speed;
@@ -39,6 +41,7 @@ public class Enemy : MonoBehaviour
             {
                 agent.Resume();
             }
+            if(targetC.health <= 0) agent.Stop();
         }
         else Destroy(gameObject);
     }

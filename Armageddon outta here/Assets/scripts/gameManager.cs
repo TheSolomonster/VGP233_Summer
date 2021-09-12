@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class gameManager : MonoBehaviour
 {
+    private DataManager dataManager;
     public GameObject winWords;
     public GameObject winImage;
     public GameObject player;
@@ -18,11 +19,13 @@ public class gameManager : MonoBehaviour
     public GameObject shooter;
     public bool GameOver = false;
     public bool GameWon = false;
+    private bool gameWonValve = true;
     private bool[] waves = new bool[] { false, false, false, false, false, false, false, false};
     // Start is called before the first frame update
     void Start()
     {
-        
+        dataManager = GetComponent<DataManager>();
+        dataManager.Load();
         playerC = player.GetComponent<playerController>();
         source.PlayOneShot(clip);
         InvokeRepeating("decreaseTimer", .5f, 1f);
@@ -31,7 +34,7 @@ public class gameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (playerC.gameWon) gameWon();
+        if (playerC.gameWon && gameWonValve) gameWon();
         else if (timer == 0 && playerC.health <= 0) gameOver();
         else
         {
@@ -133,8 +136,21 @@ public class gameManager : MonoBehaviour
     void gameWon()
     {
         GameWon = true;
+        gameWonValve = false;
         winWords.SetActive(true);
         winImage.SetActive(true);
-        winWords.GetComponent<TextMeshProUGUI>().text = "You Won!!!\n\nif you manged to escape purgatory with "+ (timer - (timer % 60)) / 60 + ":" + timer % 60 + " to spare!\n\nIf you'd like to play again press 'R'";
+        int previousBestTime = dataManager.data.bestTime;
+        if (213 - timer < previousBestTime)
+        {
+            Debug.Log("in this one");
+            winWords.GetComponent<TextMeshProUGUI>().text = "You Won!!!\n\nNew High Score: " + ((213-timer) - ((213-timer) % 60)) / 60 + ":" + (213-timer) % 60 + "\n\nIf you'd like to play again press 'R'";
+            dataManager.data.bestTime = 213 - timer;
+        }
+        else if (213 - timer >= previousBestTime)
+        {
+            winWords.GetComponent<TextMeshProUGUI>().text = "You Won!!!\n\nYour time was: " + ((213 - timer) - ((213 - timer) % 60)) / 60 + ":" + (213 - timer) % 60 + "\nbut you failed to beat your previous high score which was " + (previousBestTime - (previousBestTime % 60)) / 60 + ":" + previousBestTime % 60 + "\n\nIf you'd like to play again press 'R'";
+        }
+        dataManager.save();
+        
     }
 }
